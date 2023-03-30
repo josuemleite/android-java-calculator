@@ -16,6 +16,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = "ifsuldeminas.mch.calc";
     private Button buttonIgual;
     private TextView textViewResultado;
+    private TextView textViewUltimaExpressao;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,6 +24,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         textViewResultado = findViewById(R.id.textViewResultadoID);
+        textViewUltimaExpressao = findViewById(R.id.textViewUltimaExpressaoID);
 
         buttonIgual = findViewById(R.id.buttonIgualID);
         buttonIgual.setOnClickListener(new View.OnClickListener() {
@@ -30,10 +32,12 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Calculable avaliadorExpressao = null;
                 try {
-                    avaliadorExpressao = new ExpressionBuilder("5+1+4*2").build();
+                    String expressao = "5+1+4*2";
+                    avaliadorExpressao = new ExpressionBuilder(expressao).build();
 
                     Double resultado = avaliadorExpressao.calculate();
 
+                    textViewUltimaExpressao.setText(expressao);
                     textViewResultado.setText(resultado.toString());
                 } catch (Exception e) {
                     Log.d(TAG, e.getMessage());
