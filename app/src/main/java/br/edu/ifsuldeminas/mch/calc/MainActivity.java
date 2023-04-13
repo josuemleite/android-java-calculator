@@ -194,14 +194,22 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Calculable avaliadorExpressao = null;
                 try {
-                    String expressao = textViewResultado.getText().toString().replaceAll("–","-").replaceAll("×","*").replaceAll("÷","/").replaceAll(",",".");
+                    String expressao = textViewResultado.getText().toString().replaceAll("–","-").replaceAll("÷","/").replaceAll(",",".");
 
                     avaliadorExpressao = new ExpressionBuilder(expressao).build();
 
                     Double resultado = avaliadorExpressao.calculate();
 
+                    // Format the result to display only one or two decimal places
+                    String resultadoFormatado;
+                    if (resultado == Math.floor(resultado)) {
+                        resultadoFormatado = String.format("%.1f", resultado);
+                    } else {
+                        resultadoFormatado = String.format("%.2f", resultado);
+                    }
+
                     textViewUltimaExpressao.setText(expressao.replaceAll("-","–").replaceAll("\\*","×").replaceAll("/","÷").replaceAll("\\.",","));
-                    textViewResultado.setText(String.format("%.2f", resultado).replaceAll("\\.",","));
+                    textViewResultado.setText(resultadoFormatado.replaceAll("\\.",","));
                 } catch (Exception e) {
                     Log.d(TAG, e.getMessage());
                 }
