@@ -185,19 +185,23 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 exceedLength();
-                textViewResultado.setText(textViewResultado.getText().toString().substring(0, textViewResultado.length() - 1));
+                textViewResultado.setText(textViewResultado.getText().toString().length() > 1 ? textViewResultado.getText().toString().substring(0, textViewResultado.length() - 1) : "");
             }
         });
 
         buttonIgual.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                String expressao = textViewResultado.getText().toString().replace("–","-").replace("×","*").replace("÷","/").replace(",",".");
+
+                // Check if the expression ends with an operator
+                if (expressao.matches(".*[-+*/]$")) {
+                    return; // Exit the method without executing the calculation
+                }
+
                 Calculable avaliadorExpressao = null;
                 try {
-                    String expressao = textViewResultado.getText().toString().replaceAll("–","-").replaceAll("÷","/").replaceAll(",",".");
-
                     avaliadorExpressao = new ExpressionBuilder(expressao).build();
-
                     Double resultado = avaliadorExpressao.calculate();
 
                     // Format the result to display only one or two decimal places
@@ -208,9 +212,12 @@ public class MainActivity extends AppCompatActivity {
                         resultadoFormatado = String.format("%.2f", resultado);
                     }
 
-                    textViewUltimaExpressao.setText(expressao.replaceAll("-","–").replaceAll("\\*","×").replaceAll("/","÷").replaceAll("\\.",","));
-                    textViewResultado.setText(resultadoFormatado.replaceAll("\\.",","));
+                    // Display the expression and the result
+                    textViewUltimaExpressao.setText(expressao.replace("-","–").replace("*","×").replace("/","÷").replace(".",","));
+                    textViewResultado.setText(resultadoFormatado.replace(".",","));
                 } catch (Exception e) {
+                    // Clear the screen if an exception occurs while evaluating the expression
+                    textViewResultado.setText("");
                     Log.d(TAG, e.getMessage());
                 }
             }
