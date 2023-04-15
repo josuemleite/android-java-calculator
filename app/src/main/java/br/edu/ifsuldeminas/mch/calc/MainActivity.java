@@ -39,15 +39,19 @@ public class MainActivity extends AppCompatActivity {
     private TextView textViewResultado;
     private TextView textViewUltimaExpressao;
 
+    private int equalsCount = 0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getSupportActionBar().hide();
         setContentView(R.layout.activity_main);
         viewSetup();
 
         buttonZero.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                checkForOverwriting();
                 exceedLength();
                 textViewResultado.setText(textViewResultado.getText().toString() + "0");
             }
@@ -56,6 +60,7 @@ public class MainActivity extends AppCompatActivity {
         buttonUm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                checkForOverwriting();
                 exceedLength();
                 textViewResultado.setText(textViewResultado.getText().toString() + "1");
             }
@@ -64,6 +69,7 @@ public class MainActivity extends AppCompatActivity {
         buttonDois.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                checkForOverwriting();
                 exceedLength();
                 textViewResultado.setText(textViewResultado.getText().toString() + "2");
             }
@@ -72,6 +78,7 @@ public class MainActivity extends AppCompatActivity {
         buttonTres.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                checkForOverwriting();
                 exceedLength();
                 textViewResultado.setText(textViewResultado.getText().toString() + "3");
             }
@@ -80,6 +87,7 @@ public class MainActivity extends AppCompatActivity {
         buttonQuatro.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                checkForOverwriting();
                 exceedLength();
                 textViewResultado.setText(textViewResultado.getText().toString() + "4");
             }
@@ -88,6 +96,7 @@ public class MainActivity extends AppCompatActivity {
         buttonCinco.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                checkForOverwriting();
                 exceedLength();
                 textViewResultado.setText(textViewResultado.getText().toString() + "5");
             }
@@ -96,6 +105,7 @@ public class MainActivity extends AppCompatActivity {
         buttonSeis.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                checkForOverwriting();
                 exceedLength();
                 textViewResultado.setText(textViewResultado.getText().toString() + "6");
             }
@@ -104,6 +114,7 @@ public class MainActivity extends AppCompatActivity {
         buttonSete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                checkForOverwriting();
                 exceedLength();
                 textViewResultado.setText(textViewResultado.getText().toString() + "7");
             }
@@ -112,6 +123,7 @@ public class MainActivity extends AppCompatActivity {
         buttonOito.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                checkForOverwriting();
                 exceedLength();
                 textViewResultado.setText(textViewResultado.getText().toString() + "8");
             }
@@ -120,6 +132,7 @@ public class MainActivity extends AppCompatActivity {
         buttonNove.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                checkForOverwriting();
                 exceedLength();
                 textViewResultado.setText(textViewResultado.getText().toString() + "9");
             }
@@ -128,8 +141,14 @@ public class MainActivity extends AppCompatActivity {
         buttonVirgula.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                checkForOverwriting();
                 exceedLength();
-                textViewResultado.setText(textViewResultado.getText().toString() + ",");
+                String currentText = textViewResultado.getText().toString();
+                if (currentText.length() == 0 || !Character.isDigit(currentText.charAt(currentText.length() - 1))) {
+                    textViewResultado.setText(currentText + "0,");
+                } else {
+                    textViewResultado.setText(currentText + ",");
+                }
             }
         });
 
@@ -138,6 +157,8 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 exceedLength();
                 textViewResultado.setText(textViewResultado.getText().toString() + "+");
+                checkForOverwriting();
+                expressionValidator();
             }
         });
 
@@ -146,6 +167,8 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 exceedLength();
                 textViewResultado.setText(textViewResultado.getText().toString() + "–");
+                checkForOverwriting();
+                expressionValidator();
             }
         });
 
@@ -154,6 +177,9 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 exceedLength();
                 textViewResultado.setText(textViewResultado.getText().toString() + "×");
+                checkForOverwriting();
+                firstOperand();
+                expressionValidator();
             }
         });
 
@@ -162,6 +188,9 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 exceedLength();
                 textViewResultado.setText(textViewResultado.getText().toString() + "÷");
+                checkForOverwriting();
+                firstOperand();
+                expressionValidator();
             }
         });
 
@@ -170,12 +199,16 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 exceedLength();
                 textViewResultado.setText(textViewResultado.getText().toString() + "%");
+                checkForOverwriting();
+                firstOperand();
+                expressionValidator();
             }
         });
 
         buttonReset.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                enableButtons();
                 textViewResultado.setText("");
                 textViewUltimaExpressao.setText("");
             }
@@ -185,6 +218,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 exceedLength();
+                enableButtons();
                 textViewResultado.setText(textViewResultado.getText().toString().length() > 1 ? textViewResultado.getText().toString().substring(0, textViewResultado.length() - 1) : "");
             }
         });
@@ -192,11 +226,12 @@ public class MainActivity extends AppCompatActivity {
         buttonIgual.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                enableButtons();
                 String expressao = textViewResultado.getText().toString().replace("–","-").replace("×","*").replace("÷","/").replace(",",".");
 
-                // Check if the expression ends with an operator
+                // Verifica se a expressão termina com um operador
                 if (expressao.matches(".*[-+*/]$")) {
-                    return; // Exit the method without executing the calculation
+                    return; // Sai do método sem executar o cálculo
                 }
 
                 Calculable avaliadorExpressao = null;
@@ -215,6 +250,7 @@ public class MainActivity extends AppCompatActivity {
                     // Display the expression and the result
                     textViewUltimaExpressao.setText(expressao.replace("-","–").replace("*","×").replace("/","÷").replace(".",","));
                     textViewResultado.setText(resultadoFormatado.replace(".",","));
+                    equalsCount = 1;
                 } catch (Exception e) {
                     // Clear the screen if an exception occurs while evaluating the expression
                     textViewResultado.setText("");
@@ -258,6 +294,94 @@ public class MainActivity extends AppCompatActivity {
 //        return data;
 //    }
 
+    public void firstOperand() {
+        StringBuilder expression = new StringBuilder(textViewResultado.getText().toString().replace("–","-").replace("×","*").replace("÷","/").replace(",","."));
+
+        char firstChar = expression.charAt(0);
+        if (firstChar == '+' || firstChar == '-' || firstChar == '*' || firstChar == '/' || firstChar == '%') {
+            clearTextView();
+            return;
+        }
+    }
+
+    public void expressionValidator() {
+        StringBuilder expression = new StringBuilder(textViewResultado.getText().toString().replace("–","-").replace("×","*").replace("÷","/").replace(",","."));
+        int length = expression.length();
+
+        // Verifica se a expressão tem pelo menos dois caracteres
+        if (length < 2) {
+            return;
+        }
+
+        char penultimateChar = expression.charAt(length - 2);
+        if (penultimateChar == '+' || penultimateChar == '-' || penultimateChar == '*' || penultimateChar == '/' || penultimateChar == '%') {
+            expression.setCharAt(length - 2, expression.charAt(length - 1));
+            expression.deleteCharAt(length - 1);
+            textViewResultado.setText(expression.toString().replace("-","–").replace("*","×").replace("/","÷").replace(".",","));
+        }
+    }
+
+    private void checkForOverwriting() {
+        String expression = textViewResultado.getText().toString();
+        int length = expression.length();
+
+        if (length < 1) {
+            return;
+        }
+
+        // Verifica se o último caractere digitado é um número
+        if (Character.isDigit(expression.charAt(expression.length() - 1))) {
+
+            // Verifica se o TextView contém o resultado de uma operação anterior
+            if (equalsCount == 1 || expression.equals("0")) {
+                equalsCount = 0;
+                clearTextView();
+            }
+        }
+    }
+
+    private void clearTextView() {
+        textViewResultado.setText("");
+    }
+
+    private void disableButtons() {
+        buttonZero.setEnabled(false);
+        buttonVirgula.setEnabled(false);
+        buttonUm.setEnabled(false);
+        buttonDois.setEnabled(false);
+        buttonTres.setEnabled(false);
+        buttonQuatro.setEnabled(false);
+        buttonCinco.setEnabled(false);
+        buttonSeis.setEnabled(false);
+        buttonSete.setEnabled(false);
+        buttonOito.setEnabled(false);
+        buttonNove.setEnabled(false);
+        buttonSoma.setEnabled(false);
+        buttonSubtracao.setEnabled(false);
+        buttonMultiplicacao.setEnabled(false);
+        buttonDivisao.setEnabled(false);
+        buttonPorcento.setEnabled(false);
+    }
+
+    private void enableButtons() {
+        buttonZero.setEnabled(true);
+        buttonVirgula.setEnabled(true);
+        buttonUm.setEnabled(true);
+        buttonDois.setEnabled(true);
+        buttonTres.setEnabled(true);
+        buttonQuatro.setEnabled(true);
+        buttonCinco.setEnabled(true);
+        buttonSeis.setEnabled(true);
+        buttonSete.setEnabled(true);
+        buttonOito.setEnabled(true);
+        buttonNove.setEnabled(true);
+        buttonSoma.setEnabled(true);
+        buttonSubtracao.setEnabled(true);
+        buttonMultiplicacao.setEnabled(true);
+        buttonDivisao.setEnabled(true);
+        buttonPorcento.setEnabled(true);
+    }
+
     // Make text small if too many digits.
     private void exceedLength() {
         if (textViewResultado.getText().toString().length() > 10) {
@@ -267,22 +391,9 @@ public class MainActivity extends AppCompatActivity {
             textViewResultado.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
         }
         if (textViewResultado.getText().toString().length() > 32) {
-            buttonZero.setEnabled(false);
-            buttonVirgula.setEnabled(false);
-            buttonUm.setEnabled(false);
-            buttonDois.setEnabled(false);
-            buttonTres.setEnabled(false);
-            buttonQuatro.setEnabled(false);
-            buttonCinco.setEnabled(false);
-            buttonSeis.setEnabled(false);
-            buttonSete.setEnabled(false);
-            buttonOito.setEnabled(false);
-            buttonNove.setEnabled(false);
-            buttonSoma.setEnabled(false);
-            buttonSubtracao.setEnabled(false);
-            buttonMultiplicacao.setEnabled(false);
-            buttonDivisao.setEnabled(false);
-            buttonPorcento.setEnabled(false);
+            disableButtons();
+        } else if (textViewResultado.getText().toString().length() <= 10) {
+            textViewResultado.setTextSize(TypedValue.COMPLEX_UNIT_SP, 60);
         }
     }
 }
